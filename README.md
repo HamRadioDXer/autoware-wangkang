@@ -1,6 +1,10 @@
 <img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300"/>
 
+<<<<<<< HEAD
 # 王康的算法入门
+=======
+# PythonRobotics
+>>>>>>> 55d54b2592570638b16339577b772d3f375d4fc4
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
 [![Documentation Status](https://readthedocs.org/projects/pythonrobotics/badge/?version=latest)](https://pythonrobotics.readthedocs.io/en/latest/?badge=latest)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
@@ -62,7 +66,11 @@ Python codes for robotics algorithm.
       * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
+<<<<<<< HEAD
       * [rocket  landing](#rocket-powered-landing)
+=======
+      * [rocket powered landing](#rocket-powered-landing)
+>>>>>>> 55d54b2592570638b16339577b772d3f375d4fc4
    * [Bipedal](#bipedal)
       * [bipedal planner with inverted pendulum](#bipedal-planner-with-inverted-pendulum)
    * [License](#license)
