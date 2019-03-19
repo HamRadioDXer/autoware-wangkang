@@ -58,6 +58,7 @@
 这个模块实现了 Pure Pursuit算法来实现轨迹跟踪，可以产生一系列的控制指令来移动车辆，这个模块发出的控制消息可以被车辆控制模块订阅，或者被线控接口订阅，最终就可以实现车辆自动控制。
 ***
 ### 官方手册
+* [AUtoware](https://github.com/CPFL/Autoware/wiki)
 * [日文版 v1.4 How to use ](/others/photo/Autoware_LP.pdf)
 * [简单英文版](/others/photo/Autoware_UsersManual_v1.1.pdf)
 * [模块间关系](/others/photo/Autoware+Design+Architecture.pdf)
