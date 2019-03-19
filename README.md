@@ -1,6 +1,6 @@
 
 
-## 极简入门手册
+# 极简入门手册
 
 <img src="https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/Paper%20Cloud.png?raw=true"  width="390"/>
 
@@ -58,7 +58,7 @@
 这个模块实现了 Pure Pursuit算法来实现轨迹跟踪，可以产生一系列的控制指令来移动车辆，这个模块发出的控制消息可以被车辆控制模块订阅，或者被线控接口订阅，最终就可以实现车辆自动控制。
 ***
 ### 官方手册
-* [AUtoware](https://github.com/CPFL/Autoware/wiki)
+* [Autoware](https://github.com/CPFL/Autoware/wiki)
 * [日文版 v1.4 How to use ](/others/photo/Autoware_LP.pdf)
 * [简单英文版](/others/photo/Autoware_UsersManual_v1.1.pdf)
 * [模块间关系](/others/photo/Autoware+Design+Architecture.pdf)
@@ -66,6 +66,14 @@
 
 ---
 ### 功能介绍
+
+
+
+
+
+
+
+
 ##### Setup
 ![image](https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/setup.png?raw=true)
 
@@ -227,7 +235,62 @@ simulation模式是为了配合open_planner系列node进行路径动作规划进
 `src\computing\perception\detection\vision_detector\packages\vision_darknet_detect\data`
   下按照手册启动便会启动图像识别
 
-@import "https://github.com/CPFL/Autoware/blob/master/ros/src/computing/perception/detection/vision_detector/packages/vision_darknet_detect/README.md"
+#### Vision Darknet Detect
+
+Autoware package based on Darknet that supports Yolov3 and Yolov2 image detector.
+
+###### Requirements
+
+* NVIDIA GPU with CUDA installed
+* Pretrained [YOLOv3](https://pjreddie.com/media/files/yolov3.weights) or
+ [YOLOv2](https://pjreddie.com/media/files/yolov2.weights) model on COCO dataset,
+ Models found on the [YOLO website](https://pjreddie.com/darknet/yolo/).
+* The weights file must be placed in `vision_darknet_detect/darknet/data/`.
+
+###### How to launch
+
+* From a sourced terminal:
+
+    - `roslaunch vision_darknet_detect vision_yolo3_detect.launch`
+    - `roslaunch vision_darknet_detect vision_yolo2_detect.launch`
+
+* From Runtime Manager:
+
+Computing Tab -> Detection/ vision_detector -> `vision_darknet_detect`
+You can change the config and weights file, as well as other parameters, by clicking [app]
+
+###### Parameters
+
+Launch file available parameters:
+
+|Parameter| Type| Description|
+----------|-----|--------
+|`score_threshold`|*Double* |Detections with a confidence value larger than this value will be displayed. Default `0.5`.|
+|`nms_threshold`|*Double*|Non-Maximum suppresion area threshold ratio to merge proposals. Default `0.45`.|
+|`network_definition_file`|*String*|Network architecture definition configuration file. Default `yolov3.cfg`.|
+|`pretrained_model_file`|*String*|Path to pretrained model. Default `yolov3.weights`.|
+|`camera_id`|*String*|Camera workspace. Default `/`.|
+|`image_src`|*String*|Image source topic. Default `/image_raw`.|
+|`names_file`|*String*|Path to pretrained model. Default `coco.names`.|
+
+
+###### Subscribed topics
+
+|Topic|Type|Objective|
+------|----|---------
+|`/image_raw`|`sensor_msgs/Image`|Source image stream to perform detection.|
+|`/config/Yolo3`|`autoware_config_msgs/ConfigSSD`|Configuration adjustment for threshold.|
+
+###### Published topics
+
+|Topic|Type|Objective|
+------|----|---------
+|`/detection/vision_objects`|`autoware_msgs::DetectedObjectArray`|Contains the coordinates of the bounding box in image coordinates for detected objects.|
+
+###### Video
+
+[![Yolo v3 Autoware](https://img.youtube.com/vi/pO4vM4ehI98/0.jpg)](https://www.youtube.com/watch?v=pO4vM4ehI98)
+
 
 
 
