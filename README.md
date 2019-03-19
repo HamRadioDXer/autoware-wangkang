@@ -1,604 +1,187 @@
-<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300"/>
-
-# 算法入门
-
-[![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
-[![Documentation Status](https://readthedocs.org/projects/pythonrobotics/badge/?version=latest)](https://pythonrobotics.readthedocs.io/en/latest/?badge=latest)
-[![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
-[![Coverage Status](https://coveralls.io/repos/github/AtsushiSakai/PythonRobotics/badge.svg?branch=master)](https://coveralls.io/github/AtsushiSakai/PythonRobotics?branch=master)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/AtsushiSakai/PythonRobotics.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/AtsushiSakai/PythonRobotics/context:python)
-[![CodeFactor](https://www.codefactor.io/repository/github/atsushisakai/pythonrobotics/badge/master)](https://www.codefactor.io/repository/github/atsushisakai/pythonrobotics/overview/master)
-[![tokei](https://tokei.rs/b1/github/AtsushiSakai/PythonRobotics)](https://github.com/AtsushiSakai/PythonRobotics)
-[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
-
-Python codes for robotics algorithm.
-
-
-
-# Table of Contents
-   * [What is this?](#what-is-this)
-   * [Requirements](#requirements)
-   * [Documentation](#documentation)
-   * [How to use](#how-to-use)
-   * [Localization](#localization)
-      * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
-      * [Particle filter localization](#particle-filter-localization)
-      * [Histogram filter localization](#histogram-filter-localization)
-   * [Mapping](#mapping)
-      * [Gaussian grid map](#gaussian-grid-map)
-      * [Ray casting grid map](#ray-casting-grid-map)
-      * [k-means object clustering](#k-means-object-clustering)
-      * [Rectangle fitting](#rectangle-fitting)
-   * [SLAM](#slam)
-      * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
-      * [FastSLAM 1.0](#fastslam-10)
-      * [Graph based SLAM](#graph-based-slam)
-   * [Path Planning](#path-planning)
-      * [Dynamic Window Approach](#dynamic-window-approach)
-      * [Grid based search](#grid-based-search)
-         * [Dijkstra algorithm](#dijkstra-algorithm)
-         * [A* algorithm](#a-algorithm)
-         * [Potential Field algorithm](#potential-field-algorithm)
-      * [State Lattice Planning](#state-lattice-planning)
-         * [Biased polar sampling](#biased-polar-sampling)
-         * [Lane sampling](#lane-sampling)
-      * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
-      * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
-         * [RRT*](#rrt)
-         * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
-         * [LQR-RRT*](#lqr-rrt)
-      * [Quintic polynomials planning](#quintic-polynomials-planning)
-      * [Reeds Shepp planning](#reeds-shepp-planning)
-      * [LQR based path planning](#lqr-based-path-planning)
-      * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
-   * [Path Tracking](#path-tracking)
-      * [move to a pose control](#move-to-a-pose-control)
-      * [Stanley control](#stanley-control)
-      * [Rear wheel feedback control](#rear-wheel-feedback-control)
-      * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
-      * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
-      * [Nonlinear Model predictive control with C-GMRES](#nonlinear-model-predictive-control-with-c-gmres)
-   * [Arm Navigation](#arm-navigation)
-      * [N joint arm to point control](#n-joint-arm-to-point-control)
-      * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
-   * [Aerial Navigation](#aerial-navigation)
-      * [drone 3d trajectory following](#drone-3d-trajectory-following)
-      * [rocket  landing](#rocket-powered-landing)
-   * [Bipedal](#bipedal)
-      * [bipedal planner with inverted pendulum](#bipedal-planner-with-inverted-pendulum)
-   * [License](#license)
-   * [Use-case](#use-case)
-   * [Contribution](#contribution)
-   * [Support](#support)
-   * [Authors](#authors)
 
-# What is this?
 
-This is a Python code collection of robotics algorithms, especially for autonomous navigation.
+## 极简入门手册
+
+<img src="https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/Paper%20Cloud.png?raw=true"  width="390"/>
+
+### 主要模块
+
+### Localization
+#### lidar_localizar 
+   计算车辆当在全局坐标的当前位置(x,y,z,roll,pitch,yaw)，使用LIDAR的扫描数据和预先构建的地图信息。autoware推荐使用正态分布变换(NDT)算法来匹配激光雷达当前帧和3D map。
+#### gnss_localizer 
+转换GNSS接收器发来的NEMA/FIX消息到位置信息(x,y,z,roll,pitch,yaw)。结果可以被单独使用为车辆当前位置，也可以作为lidar_localizar的初始参考位置。
+**dead_reckoner** 主要使用IMU传感器预测车辆的下一帧位置，也可以用来对lidar_localizar和gnss_localizar的结果进行插值。
+#### Detection
+##### lidar_detector 
+从激光雷达单帧扫描读取点云信息，提供基于激光雷达的目标检测。主要使用欧几里德聚类算法，从地面以上的点云得到聚类结果。除此之外，可以使用基于卷积神经网路的算法进行分类，包括**VoxelNet,LMNet**.
+##### image_detector 
+读取来自摄像头的图片，提供基于图像的目标检测。主要的算法包括R-CNN，SSD和Yolo，可以进行多类别(汽车，行人等)实时目标检测。
+##### image_tracker 
+使用image_detector的检测结果完成目标跟踪功能。算法基于Beyond Pixels，图像上的目标跟踪结果被投影到3D空间，结合lidar_detector的检检测结果输出最终的目标跟踪结果。
+##### fusion_detector 
+输入激光雷达的单帧扫描点云和摄像头的图片信息，进行在3D空间的更准确的目标检测。激光雷达的位置和摄像头的位置需要提前进行联合标定，现在主要是基于MV3D算法来实现。
+##### fusion_tools
+ 将**lidar_detector**和**image_detector**的检测结果进行融合，**image_detector** 的识别类别被添加到lidar_detector的聚类结果上。
+##### object_tracter
+ 预测检测目标的下一步位置，跟踪的结果可以被进一步用于目标行为分析和目标速度分析。跟踪算法主要是基于卡尔曼滤波器。
+ 
+
+---
+#### Prediction
+##### moving_predictor 
+使用目标跟踪的结果来预测临近物体的未来行动轨迹，例如汽车或者行人。
+##### collision_predictor
+使用moving_predictor的结果来进一步预测未来是否会与跟踪目标发生碰撞。输入的信息包括车辆的跟踪轨迹，车辆的速度信息和目标跟踪信息。
+
+---
+#### Misson planning
+##### route_planner
+ 寻找到达目标地点的全局路径，路径由道路网中的一系列十字路口组成。
+##### lane_planner 
+根据route_planner发布的一系列十字路口结果，确定全局路径由哪些lane组成，lane是由一系列waypoint点组成
+##### waypoint_planner 
+可以被用于产生到达目的地的一系列waypoint点，它与lane_planner的不同之处在于它是发布单一的到达目的地的waypoint路径,而lane_planner是发布到达目的地的一系列waypoint数组。
+##### waypoint_maker 
+是一个保存和加载手动制作的waypoint文件的工具。为了保存waypoint到文件里，需要手动驾驶车辆并开启定位模块，然后记录车辆的一系列定位信息以及速度信息， 被记录的信息汇总成为一个路径文件，之后可以加载这个本地文件，并发布需要跟踪的轨迹路径信息给其他规划模块。
+
+---
+#### Motion planning
+##### velovity_planner 
+更新车辆速度信息，注意到给定跟踪的waypoint里面是带有速度信息的，这个模块就是根据车辆的实际状态进一步修正速度信息，以便于实现在停止线前面停止下来或者加减速等等。
+
+##### astar_planner 
+实现Hybrid-State A*查找算法，生成从现在位置到指定位置的可行轨迹，这个模块可以实现避障，或者在给定waypoint下的急转弯，也包括在自由空间内的自动停车。
+##### adas_lattice_planner 
+实现了State Lattice规划算法，基于样条曲线，事先定义好的参数列表和语义地图信息，在当前位置前方产生了多条可行路径，可以被用来进行障碍物避障或车道线换道。
+##### waypoint_follower 
+这个模块实现了 Pure Pursuit算法来实现轨迹跟踪，可以产生一系列的控制指令来移动车辆，这个模块发出的控制消息可以被车辆控制模块订阅，或者被线控接口订阅，最终就可以实现车辆自动控制。
+***
+### 官方手册
+* [日文版 v1.4 How to use ](/others/photo/Autoware_LP.pdf)
+* [简单英文版](/others/photo/Autoware_UsersManual_v1.1.pdf)
+* [模块间关系](/others/photo/Autoware+Design+Architecture.pdf)
+* [Autoware矢量地图格式](/others/photo/b496edec-3e22-4f5c-9928-25a8ea3010fd.pdf)
+
+---
+### 功能介绍
+##### Setup
+![image](https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/setup.png?raw=true)
+
+* 设置激光雷达的TF树
+* Vehicle model：在RVIZ中的车体信息
+  ***
+<img src="https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/%E9%80%89%E5%8C%BA_005.png?raw=true" weight="120"> 
+
+* /base_link 所在的坐标系
+* 在RVIZ可视化的str
+* 显示的尺寸
+* urdf文件，建模文件
+* joint_state_publisher 加入tf树
+***
+##### 传感器驱动
+<img src="https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/2.png?raw=true">
+
+*  guid 是需要填入安装具体对象的对应的摄像头出厂编号
+*  ip可以设置为静态，从官方工具中查看
+*  camera_info_url ： 相机标定的参数，最好用MATLAB工具进行标定
+* acquisition rate  ： 摄像头帧率
+* 像素格式选择默认
+* exposure：曝光参数需要和镜头光圈大小同时调整
+* 如果是近焦之后的参数选择默认就好
+* 此摄像头驱动 ros package 需要放入相关文件夹后重新编译安装
+  
+###### 其他驱动
+* 雷达驱动IP始终为静态ip，所以直接launch
+
+***
+##### 初始数据预处理
+<img src="https://github.com/HamRadioDXer/autoware-wangkang/blob/master/others/photo/%E6%88%AA%E5%9B%BE.png?raw=true">
+
+
 
-Features:
+  > 分为**点云降采样**，**点云预处理**，**多激光雷达初始矫正**
+  * 点云降采样根据情况所需选择合适的算法，只能运行其中一个。大多选择voxel_grid_filter
+  * 点云预处理根据不同激光雷达算法选择是否启动。多和lidar trac有关
+* Fusion
+##### Multi LiDAR Calibrator
 
-1. Easy to read for understanding each algorithm's basic idea.
+This package allows to obtain the extrinsic calibration between two PointClouds with the help of the NDT algorithm.
 
-2. Widely used and practical algorithms are selected.
+The `multi_lidar_calibrator` node receives two `PointCloud2` messages (parent and child), and an initialization pose.
+If possible, the transformation required to transform the child to the parent point cloud is calculated, and output to the terminal.
 
-3. Minimum dependency.
+###### How to launch
 
-See this paper for more details:
+1. **You'll need to provide an initial guess, otherwise the transformation won't converge.**
 
-- [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
+2. In a sourced terminal:
 
+Using rosrun
 
-# Requirements
+`rosrun multi_lidar_calibrator multi_lidar_calibrator _points_child_src:=/lidar_child/points_raw _points_parent_src:=/lidar_parent/points_raw _x:=0.0 _y:=0.0 _z:=0.0 _roll:=0.0 _pitch:=0.0 _yaw:=0.0`
 
-- Python 3.6.x (2.7 is not supported)
+Using roslaunch
 
-- numpy
+`roslaunch multi_lidar_calibrator multi_lidar_calibrator points_child_src:=/lidar_child/points_raw points_parent_src:=/lidar_parent/points_raw x:=0.0 y:=0.0 z:=0.0 roll:=0.0 pitch:=0.0 yaw:=0.0`
 
-- scipy
+3. Play a rosbag with both lidar data `/lidar_child/points_raw` and `/lidar_parent/points_raw`
 
-- matplotlib
+4. The resulting transformation will be shown in the terminal as shown in the *Output* section.
 
-- pandas
+5. Open RViz and set the fixed frame to the Parent
 
-- [cvxpy](http://www.cvxpy.org/en/latest/) 
+6. Add both point cloud `/lidar_parent/points_raw` and `/points_calibrated`
 
-# Documentation
+7. If the algorithm converged, both PointClouds will be shown in rviz.
 
-This README only shows some examples of this project. 
+###### Input topics
 
-If you are interested in other examples or mathematical backgrounds of each algorithm, 
+|Parameter| Type| Description|
+----------|-----|--------
+|`points_parent_src`|*String* |PointCloud topic name to subscribe and synchronize with the child.|
+|`points_child_src`|*String*|PointCloud topic name to subscribe and synchronize with the parent.|
+|`voxel_size`|*double*|Size of the Voxel used to downsample the CHILD pointcloud. Default: 0.5|
+|`ndt_epsilon`|*double*|The transformation epsilon in order for an optimization to be considered as having converged to the final solution. Default: 0.01|
+|`ndt_step_size`|*double*|Set/change the newton line search maximum step length. Default: 0.1|
+|`ndt_resolution`|*double*|Size of the Voxel used to downsample the PARENT pointcloud. Default: 1.0|
+|`ndt_iterations`|*double*|The maximum number of iterations the internal optimization should run for. Default: 400|
+|`x`|*double*|Initial Guess of the transformation x. Meters|
+|`y`|*double*|Initial Guess of the transformation y. Meters|
+|`z`|*double*|Initial Guess of the transformation z. Meters|
+|`roll`|*double*|Initial Guess of the transformation roll. Radians|
+|`pitch`|*double*|Initial Guess of the transformation pitch. Radians|
+|`yaw`|*double*|Initial Guess of the transformation yaw. Radians|
 
-You can check the full documentation online: [https://pythonrobotics.readthedocs.io/](https://pythonrobotics.readthedocs.io/)
+##### Output
 
-All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation gifs of PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs)
+1. Child Point cloud transformed to the Parent frame and published in `/points_calibrated`. 
+1. Output in the terminal showing the X,Y,Z,Yaw,Pitch,Roll transformation between child and parent. These values can be used later with the `static_transform_publisher`.
 
-# How to use
 
-1. Clone this repo.
+###### Output example:
 
-> git clone https://github.com/AtsushiSakai/PythonRobotics.git
+```
+transformation from ChildFrame to ParentFrame
+This transformation can be replicated using:
 
-> cd PythonRobotics/
+rosrun tf static_transform_publisher 1.7096 -0.101048 -0.56108 1.5708 0.00830573  0.843 /ParentFrame /ChildFrame 10
+```
+The figure below shows two lidar sensors calibrated by this node.
+One is shown in gray while the other is show in blue.
+Image obtained from rviz.
 
+[Calibration Result](others/photo/calibration_result.jpeg)
 
-2. Install the required libraries. You can use environment.yml with conda command.
+<img src ="others/photo/calibration_result.jpeg" weight="10">
 
-> conda env create -f environment.yml
-
-
-3. Execute python script in each directory.
-
-4. Add star to this repo if you like it :smiley:. 
-
-# Localization
-
-## Extended Kalman Filter localization
-
-<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
-
-Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
-
-## Particle filter localization
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif)
-
-This is a sensor fusion localization with Particle Filter(PF).
-
-The blue line is true trajectory, the black line is dead reckoning trajectory,
-
-and the red line is estimated trajectory with PF.
-
-It is assumed that the robot can measure a distance from landmarks (RFID).
-
-This measurements are used for PF localization.
-
-Ref:
-
-- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
-
-
-## Histogram filter localization
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif)
-
-This is a 2D localization example with Histogram filter.
-
-The red cross is true position, black points are RFID positions.
-
-The blue grid shows a position probability of histogram filter.  
-
-In this simulation, x,y are unknown, yaw is known.
-
-The filter integrates speed input and range observations from RFID for localization.
-
-Initial position is not needed.
-
-Ref:
-
-- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
-
-# Mapping
-
-## Gaussian grid map
-
-This is a 2D Gaussian grid mapping example.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
-
-## Ray casting grid map
-
-This is a 2D ray casting grid mapping example.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
-
-## k-means object clustering
-
-This is a 2D object clustering with k-means algorithm.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
-
-## Rectangle fitting
-
-This is a 2D rectangle fitting for vehicle detection.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif)
-
-
-# SLAM
-
-Simultaneous Localization and Mapping(SLAM) examples
-
-## Iterative Closest Point (ICP) Matching
-
-This is a 2D ICP matching example with singular value decomposition.
-
-It can calculate a rotation matrix and a translation vector between points to points.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif)
-
-Ref:
-
-- [Introduction to Mobile Robotics: Iterative Closest Point Algorithm](https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf)
-
-
-## FastSLAM 1.0
-
-This is a feature based SLAM example using FastSLAM 1.0.
-
-The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM.
-
-The red points are particles of FastSLAM.
-
-Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
-
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif)
-
-
-Ref:
-
-- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
-
-- [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
-
-
-## Graph based SLAM
-
-This is a graph based SLAM example.
-
-The blue line is ground truth.
-
-The black line is dead reckoning.
-
-The red line is the estimated trajectory with Graph based SLAM.
-
-The black stars are landmarks for graph edge generation.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif)
-
-Ref:
-
-- [A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
-
-
-# Path Planning
-
-## Dynamic Window Approach
-
-This is a 2D navigation sample code with Dynamic Window Approach.
-
-- [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
-
-
-## Grid based search
-
-### Dijkstra algorithm
-
-This is a 2D grid based shortest path planning with Dijkstra's algorithm.
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif)
-
-In the animation, cyan points are searched nodes.
-
-### A\* algorithm
-
-This is a 2D grid based shortest path planning with A star algorithm.
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif)
-
-In the animation, cyan points are searched nodes.
-
-Its heuristic is 2D Euclid distance.
-
-### Potential Field algorithm
-
-This is a 2D grid based path planning with Potential Field algorithm.
-
-![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
-
-In the animation, the blue heat map shows potential value on each grid.
-
-Ref:
-
-- [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
-
-## State Lattice Planning
-
-This script is a path planning code with state lattice planning.
-
-This code uses the model predictive trajectory generator to solve boundary problem.
-
-Ref: 
-
-- [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
-
-- [State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments](http://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf)
-
-
-### Biased polar sampling
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
-
-
-### Lane sampling
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
-
-## Probabilistic Road-Map (PRM) planning 
-
-![PRM](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
-
-This PRM planner uses Dijkstra method for graph search.
-
-In the animation, blue points are sampled points,
-
-Cyan crosses means searched points with Dijkstra method,
-
-The red line is the final path of PRM.
-
-Ref:
-
-- [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
-
-　　
-
-## Rapidly-Exploring Random Trees (RRT)
-
-### RRT\*
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobtics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif)
-
-This is a path planning code with RRT\*
-
-Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
-
-Ref:
-
-- [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
-
-- [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
-
-### RRT\* with reeds-sheep path
-
-![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
-
-Path planning for a car robot with RRT\* and reeds sheep path planner.
-
-### LQR-RRT\*
-
-This is a path planning simulation with LQR-RRT\*.
-
-A double integrator motion model is used for LQR local planner.
-
-![LQRRRT](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif)
-
-Ref:
-
-- [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
-
-- [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in its phase plot](https://github.com/MahanFathi/LQR-RRTstar)
-
-
-## Quintic polynomials planning
-
-Motion planning with quintic polynomials.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
-
-It can calculate 2D path, velocity, and acceleration profile based on quintic polynomials.
-
-Ref:
-
-- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
-
-## Reeds Shepp planning
-
-A sample code with Reeds Shepp path planning.
-
-![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
-
-Ref:
-
-- [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
-
-- [optimal paths for a car that goes both forwards and backwards](https://pdfs.semanticscholar.org/932e/c495b1d0018fd59dee12a0bf74434fac7af4.pdf)
-
-- [ghliu/pyReedsShepp: Implementation of Reeds Shepp curve\.](https://github.com/ghliu/pyReedsShepp)
-
-
-## LQR based path planning
-
-A sample code using LQR based path planning for double integrator model.
-
-![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
-
-
-## Optimal Trajectory in a Frenet Frame 
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
-
-This is optimal trajectory generation in a Frenet Frame.
-
-The cyan line is the target course and black crosses are obstacles.
-
-The red line is predicted path.
-
-Ref:
-
-- [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame](https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
-
-- [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
-
-
-# Path Tracking
-
-## move to a pose control
-
-This is a simulation of moving to a pose control
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
-
-Ref:
-
-- [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
-
-
-## Stanley control
-
-Path tracking simulation with Stanley steering control and PID speed control.
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif)
-
-Ref:
-
-- [Stanley: The robot that won the DARPA grand challenge](http://robots.stanford.edu/papers/thrun.stanley05.pdf)
-
-- [Automatic Steering Methods for Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
-
-
-
-## Rear wheel feedback control
-
-Path tracking simulation with rear wheel feedback steering control and PID speed control.
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
-
-Ref:
-
-- [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
-
-
-## Linear–quadratic regulator (LQR) speed and steering control
-
-Path tracking simulation with LQR speed and steering control.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
-
-Ref:
-
-- [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
-
-
-## Model predictive speed and steering control
-
-Path tracking simulation with iterative linear model predictive speed and steering control.
-
-<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
-
-Ref:
-
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
-
-## Nonlinear Model predictive control with C-GMRES
-
-A motion planning and path tracking simulation with NMPC of C-GMRES 
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif)
-
-Ref:
-
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/cgmres_nmpc/cgmres_nmpc.ipynb)
-
-
-# Arm Navigation
-
-## N joint arm to point control
-
-N joint arm to a point control simulation.
-
-This is a interactive simulation.
-
-You can set the goal position of the end effector with left-click on the ploting area. 
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
-
-In this simulation N = 10, however, you can change it.
-
-## Arm navigation with obstacle avoidance 
-
-Arm navigation with obstacle avoidance simulation.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
-
-
-# Aerial Navigation
-
-## drone 3d trajectory following 
-
-This is a 3d trajectory following simulation for a quadrotor.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
-
-## rocket powered landing
-
-This is a 3d trajectory generation simulation for a rocket powered landing.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
-
-Ref:
-
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
-
-# Bipedal
-
-## bipedal planner with inverted pendulum
-
-This is a bipedal planner for modifying footsteps with inverted pendulum.
-
-You can set the footsteps and the planner will modify those automatically.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Bipedal/bipedal_planner/animation.gif)
-
-# License 
-
-MIT
-
-# Use-case
-
-See: [users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
-
-# Contribution
-
-A small PR like bug fix is welcome.
-
-If your PR is merged multiple times, I will add your account to the author list.
-
-# Support
-
-If you or your company would like to support this project, please consider:
-
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
-
-- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
-
-You can add your name or your company logo in README if you are a patron.
-
-E-mail consultant is also available.
-
- 　
-
-Your comment using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai) is also welcome. 
-
-This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
-
-# Authors
-
-- [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
-
-- [Daniel Ingram](https://github.com/daniel-s-ingram)
-
-- [Joe Dinius](https://github.com/jwdinius)
-
-- [Karan Chawla](https://github.com/karanchawla)
-
-- [Antonin RAFFIN](https://github.com/araffin)
-
-- [Alexis Paques](https://github.com/AlexisTM)
-
-
+***
+#### 算法模块
+> 暂时用到的（2019/03/19）
+> * NDT相关
+>  * 视觉识别跟踪
+> * 激光雷达识别跟踪
+> * 激光-视觉融合设置属性判断碰撞
 
 
 
