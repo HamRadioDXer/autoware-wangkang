@@ -196,6 +196,22 @@ Image obtained from rviz.
 
   <img src="others/photo/NDTS.png">
 
+* 在仿真环境下需要不断调整Initial pos 使得Z 方向的点云可以对齐匹配。还没有试过模拟GNSS 定位（LG的launch文件里没有用模拟GPS）
+* Predict Pose：参考NDT论文
+* Get Height 有助于提高定位速度（也是仿真时影响Z轴对齐的主要原因之一）
+* use odom 有助于成功率和精度
+
+![ndtmo](/others/photo/NDTMO.png)
+* 设置精度对匹配有一个简单的评价,显示NDT定位当前的状态（**初始化状态**，**成功**，**丢失**等）
+  
+<img src="/others/photo/CONNETCER.png">
+
+* 此插件是将右方填入的话题数据准换为左边的名字，ROS 中remap的作用
+是为了接受来自不同定位算法得到的位姿信息话题，提高灵活性
+simulation模式是为了配合open_planner系列node进行路径动作规划进行仿真的选项，勾选后接收话题就为sim估计出来的位姿形成闭环，不是由NDT等提供了（即抛离定位模块，只和规划有关）
+* 输出的/current_pose ,/current_velocity。是全局话题，之后的预测，规划，执行算法都严重依赖此话题
+
+
 ***
 分割线
 
