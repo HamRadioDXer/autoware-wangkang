@@ -196,8 +196,161 @@ Image obtained from rviz.
 
   <img src="others/photo/NDTS.png">
 
+***
+分割线
 
+***
+#这是一个简单示例
 
+## Lidar Velodyne 32C
+Velodyne 32C is a new Lidar while driver and calibration file should be updated.
+
+These files has been saved to [Velodyne32C](https://github.com/xfqbuaa/PIX-Hackathon-Autoware/tree/master/Velodyne32c)
+
+### launch file
+Copy Velodyne 32C launch file to the following address:
+`Autoware/ros/src/sensing/drivers/lidar/packages/velodyne/velodyne_pointcloud/launch/32c_points.launch`
+
+### calibration file
+Copy Velodyne 32C calibration yaml file to the following address:
+`Autoware/ros/src/sensing/drivers/lidar/packages/velodyne/velodyne_pointcloud/params/VLP-32C.yaml`
+
+### driver
+Copy Velodyne 32C driver cc file to the following address:
+`Autoware/ros/src/sensing/drivers/lidar/packages/velodyne/velodyne_driver/src/driver/driver.cc`
+
+### factor distance to resolution  
+Velodyne 32C factor distance to resolution is different from others Velodyne products, this factor should be modified as following:
+
+1. driver file
+
+`Autoware/ros/src/sensing/drivers/lidar/packages/velodyne/velodyne_pointcloud/src/lib/rawdata.cc`
+
+2. Change
+`float distance = tmp.uint * DISTANCE_RESOLUTION;` to
+`float distance = tmp.uint * 0.004;`
+
+## How to connect Velodyne Lidar  
+* Install ros-velodyne driver:
+
+```
+sudo apt-get install ros-VERSION-velodyne
+```
+* Connect velodyne 32C and disconnect wifi
+* Velodyne 32C IP setting
+* Robot Cafe car: 192.168.1.201
+* Civic: 192.168.0.201
+* Computer IP set with in Lidar net, e.g. (robot cafe car 192.168.1.100; Civic 192.168.0.100)  
+* View Lidar data
+
+```
+roslaunch velodyne_pointcloud 32c_points.launch
+rosrun rviz rviz -f velodyne
+```
+[ROS Velodyne driver install and connect guide](http://wiki.ros.org/velodyne/Tutorials/Getting%20Started%20with%20th)
+
+The computer ip should be set in Lidar net but last not 201 (which is for Lidar).
+
+The Lidars ip can be set same ip.
+
+## How to record rosbag
+Make sure you have connected with Lidar successfully and have enough free disk space.
+```
+roslaunch velodyne_pointcloud 32c_points.launch
+rosrun rviz rviz -f velodyne
+rosbag record -a
+```
+
+## How to generate map and waypoints
+* Load simulation rosbag file, play and pause.
+* Change rosbag topic name to /points_raw
+* The demo.rosbag can be used here for following tutorial.
+
+The above two step can be done with the following commands:
+
+```
+rosbag play -r 0.7 bag_name.bag /velodyne_points:=/points_raw
+```
+You can use space button to stop and play rosbag in ternimal.
+
+* Downsample rosbag files with voxel_grid_filter.
+
+![](./images/voxelfilter.png)
+![](./images/downsample.png)
+When you click ROSBAG Record stop button, the new downsample rosbag will be saved.
+* Change downsample rosbag topic name to /points_raw
+
+```
+rosbag play -r 0.7 bag_name.bag /filtered_points:=/points_raw
+```
+* Active ndt_localizer | ndt_mapping
+* waypoint_maker | waypoint_saver
+* Run whole simulation rosbag
+* Output pcb
+
+![](./images/pcb1.png)
+
+![](./images/pcb2.png)
+* Save waypoints
+
+![](./images/wp1.png)
+![](./images/wp_tf.png)
+![](./images/wp_map.png)
+![](./images/wp_sensing.png)
+![](./images/wp_computing.png)
+
+* The Velodyne default topic name is velodyne_points.
+* The downsample rosbag default topic name is filtered_points/
+* Please confirm voxel_grid_filter and ROSBAG Record topic name agree with rosbag playing.
+* You can check topic data available or not using Autoware Topics.
+* Make sure modify app parameters first then active related nodes function.
+
+![](./images/topics.png)
+
+## How to Simulate
+ Here is simulation process and rviz visualization with generated pcb and waypoints file.
+ * Setup, sensing
+ * Load Map load pcb, waypoints file
+ * Computing setting
+ * Rviz to simulate
+ * If error please check every settings and redo it again.
+ * Make sure active vel_pose_connect in Simulation Mode.
+ * Make sure waypoint_follower is waypoint.
+
+![](./images/sim_computing.png)
+![](./images/sim2.png)
+
+## How to make self-driving car follow waypoints
+* Make sure deactive vel_pose_connect Simulate Mode.
+* Make sure deactive waypoint_follower | wf_simulator.
+
+![](./images/follow_1.png)
+
+## How to detect obstacle with Lidar
+* Make sure velocity_set | Points_topics is points_no_ground.
+
+![](./images/obstacle_1.png)
+![](./images/obstacle_2.png)
+
+## Topics in the future
+### Autoware Lidar obstacle detection failure on upslope.
+* Autoware Lidar obstacle detection function will false detect upslope as obstacle and don't move.
+
+### Police gestures detection
+* The dataset should be big and diversity enough to prevent deep learning model over fitting.
+* LSTM model has been used instead of CNN model to consider time serial.  
+* Police gesture detection have been localized for different countries.
+
+### The robot cafe car CAN control
+* Through we have control robot cafe car through CAN, the driving performance is really bad, especially on upslope.
+* There are still a lot of improvement potential for vehicle OEM and Tier1 e.g. Bosch to do in the hardware and CAN control.
+
+## Reference
+* [Autoware](https://github.com/CPFL/Autoware)
+* [Apollo](https://github.com/ApolloAuto/apollo)
+* [Busmaster](https://github.com/rbei-etas/busmaster)
+* [comma.ai panda](https://github.com/commaai/panda)
+* [hdl_graph_slam](https://github.com/koide3/hdl_graph_slam)
 
 
 
