@@ -58,6 +58,7 @@
 这个模块实现了 Pure Pursuit算法来实现轨迹跟踪，可以产生一系列的控制指令来移动车辆，这个模块发出的控制消息可以被车辆控制模块订阅，或者被线控接口订阅，最终就可以实现车辆自动控制。
 ***
 ### 官方手册
+* [AUtoware](https://github.com/CPFL/Autoware/wiki)
 * [日文版 v1.4 How to use ](/others/photo/Autoware_LP.pdf)
 * [简单英文版](/others/photo/Autoware_UsersManual_v1.1.pdf)
 * [模块间关系](/others/photo/Autoware+Design+Architecture.pdf)
@@ -210,6 +211,47 @@ Image obtained from rviz.
 是为了接受来自不同定位算法得到的位姿信息话题，提高灵活性
 simulation模式是为了配合open_planner系列node进行路径动作规划进行仿真的选项，勾选后接收话题就为sim估计出来的位姿形成闭环，不是由NDT等提供了（即抛离定位模块，只和规划有关）
 * 输出的/current_pose ,/current_velocity。是全局话题，之后的预测，规划，执行算法都严重依赖此话题
+
+``` js
+- name: /ff_waypoint_follower
+  publish: [/twist_raw, /wf_stat, /curr_simu_pose, /follow_pose, /sim_pose, /sim_velocity,
+    /twist_cmd, /ControlBoxOdom, /linear_velocity_viz]
+  subscribe: [/initialpose, /current_pose, /odom, /current_velocity, /current_behavior,
+    /final_waypoints, /usb_controller_r_signal]
+```
+
+##### 视觉识别（YOLO ,SSD）
+<img src="others/photo/YOLO3.png">
+
+* 把训练好的.weights文件放到
+`src\computing\perception\detection\vision_detector\packages\vision_darknet_detect\data`
+  下按照手册启动便会启动图像识别
+
+@import "https://github.com/CPFL/Autoware/blob/master/ros/src/computing/perception/detection/vision_detector/packages/vision_darknet_detect/README.md"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ***
