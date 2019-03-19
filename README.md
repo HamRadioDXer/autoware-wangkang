@@ -182,7 +182,19 @@ Image obtained from rviz.
 >  * 视觉识别跟踪
 > * 激光雷达识别跟踪
 > * 激光-视觉融合设置属性判断碰撞
+> * 交通灯识别
+ ##### 激光雷达相关
 
+![NDT](/others/photo/NDT.png)
+* 具体建图步骤见PDF
+* 当数据包播放完成时NDT不一定同时完成建图，需要在Shell查看进度
+* 点云地图比较稀疏时，定位容易丢失，调整scan范围比较有效
+* 处理方式最好选用pcl_anh_gpu
+* 在输出地图PCD时可以时分辨率变大，文件较小
+  
+  ___
+
+  <img src="others/photo/NDTS.png">
 
 
 
